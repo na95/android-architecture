@@ -2,16 +2,23 @@ package com.anle.todomvp.tasks;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
+import com.anle.todomvp.data.source.TasksRepository;
 import com.anle.todomvp.data.source.local.TasksDbHelper;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class TasksPresenter implements TasksContract.UserActionListener {
 
-    private Context mContext;
-    private TasksDbHelper mTaskDbHelper;
+    private final TasksRepository mTasksRepository;
 
-    public TasksPresenter(Context mContext) {
-        this.mContext = mContext;
-        mTaskDbHelper = new TasksDbHelper(mContext);
+    private final TasksContract.View mTasksView;
+
+    public TasksPresenter(
+            @NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
+        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
+        mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
     }
 
     @Override

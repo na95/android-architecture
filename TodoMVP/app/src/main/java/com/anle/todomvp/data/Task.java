@@ -110,4 +110,13 @@ public class Task {
     public String toString() {
         return "Task with title " + mTitle;
     }
+
+    @Nullable
+    public String getTitleForList() {
+        if (mTitle != null && !mTitle.equals("")) {
+            return mTitle;
+        } else {
+            return mContent;
+        }
+    }
 }
