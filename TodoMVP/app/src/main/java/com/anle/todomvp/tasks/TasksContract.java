@@ -10,33 +10,39 @@ public interface TasksContract {
 
         void setProgressIndicator(boolean active);
 
-        void showAllTasks(List<Task> taskList);
+        void showTasks(List<Task> taskList);
 
-        void showAddNewTaskUI();
+        void showAddEditTaskUI();
 
-        void showDetailTaskUI(String id);
+        void showDetailTaskUI(String taskId);
 
-        void showActivedTasks();
+        void showTaskMarkedComplete();
 
-        void showCompletedTasks();
+        void showTaskMarkedActive();
 
-        void showLoadingTaskError();
+        void showLoadingTasksError();
+
+        boolean isInactive();
+
+        void showCompletedTasksCleared();
     }
 
     interface UserActionListener{
 
-        void loadAllTasks();
+        void loadAllTasks(boolean forceUpdate);
 
         void addNewTask();
 
-        void openTaskDetail();
+        void openTaskDetail(Task task);
 
-        void completeTask();
+        void completeTask(Task task);
 
-        void activateTask();
+        void activateTask(Task task);
 
-        void loadCompletedTask();
+        void loadActiveTasks(boolean forceUpdate);
 
-        void clearCompletedTask();
+        void loadCompletedTasks(boolean forceUpdate);
+
+        void clearCompletedTasks();
     }
 }

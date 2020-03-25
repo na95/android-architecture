@@ -34,7 +34,7 @@ public class Task {
      * @param completed
      */
     public Task(String title, String content, String itemId, boolean completed) {
-        this.mId = UUID.randomUUID().toString();
+        this.mId = itemId;
         this.mTitle = title;
         this.mContent = content;
         this.mCompleted = completed;
@@ -117,6 +117,15 @@ public class Task {
             return mTitle;
         } else {
             return mContent;
+        }
+    }
+
+    @Nullable
+    public String getContentForList() {
+        if (mContent != null && !mContent.equals("")) {
+            return mContent;
+        } else {
+            return "-";
         }
     }
 }
