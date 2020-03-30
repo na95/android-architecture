@@ -125,7 +125,7 @@ public class Task {
         if (mContent != null && !mContent.equals("")) {
             return mContent;
         } else {
-            return "-";
+            return "";
         }
     }
 }

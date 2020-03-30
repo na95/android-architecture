@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -11,6 +14,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 
 import com.anle.todomvp.Injection;
@@ -22,7 +26,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 public class TaskDetailFragment extends Fragment implements TaskDetailContract.View {
 
-    public static final String EXTRA_TASK_ID = "TASK_ID";
+    public static final String AGRUMENT_TASK_ID = "TASK_ID";
 
     public static final int REQUEST_EDIT_TASK = 1;
 
@@ -37,7 +41,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     public static TaskDetailFragment newInstance(String taskId) {
         Bundle arguments = new Bundle();
-        arguments.putString(EXTRA_TASK_ID, taskId);
+        arguments.putString(AGRUMENT_TASK_ID, taskId);
         TaskDetailFragment fragment = new TaskDetailFragment();
         fragment.setArguments(arguments);
         return fragment;
@@ -85,7 +89,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String taskId = getArguments().getString(EXTRA_TASK_ID);
+                String taskId = getArguments().getString(AGRUMENT_TASK_ID);
                 mUserActionsListener.editTask(taskId);
             }
         });
@@ -93,8 +97,26 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         return root;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.taskdetail_fragment_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_delete:
+                String taskId = getArguments().getString(AGRUMENT_TASK_ID);
+                mUserActionsListener.deleteTask(taskId);
+                return true;
+        }
+        return false;
+    }
+
+
     private void openTask() {
-        String taskId = getArguments().getString(EXTRA_TASK_ID);
+        String taskId = getArguments().getString(AGRUMENT_TASK_ID);
         mUserActionsListener.openTask(taskId);
     }
 
@@ -141,9 +163,9 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
             @Override
             public void onClick(View v) {
                 if (complete) {
-                    mUserActionsListener.activateTask(getArguments().getString(EXTRA_TASK_ID));
+                    mUserActionsListener.activateTask(getArguments().getString(AGRUMENT_TASK_ID));
                 } else {
-                    mUserActionsListener.completeTask(getArguments().getString(EXTRA_TASK_ID));
+                    mUserActionsListener.completeTask(getArguments().getString(AGRUMENT_TASK_ID));
                 }
             }
         });

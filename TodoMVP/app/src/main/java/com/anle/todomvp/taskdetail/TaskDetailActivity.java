@@ -11,6 +11,8 @@ import com.anle.todomvp.util.ActivityUtils;
 
 public class TaskDetailActivity extends AppCompatActivity {
 
+    public static final String EXTRA_TASK_ID = "TASK_ID";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,17 +25,14 @@ public class TaskDetailActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
 
-        if (null == savedInstanceState) {
+        // Get the requested task id
+        String taskId = getIntent().getStringExtra(EXTRA_TASK_ID);
 
-            String taskId = getIntent().getStringExtra(TaskDetailFragment.EXTRA_TASK_ID);
-            TaskDetailFragment taskDetailFrag = TaskDetailFragment.newInstance(taskId);
-
-            Bundle bundle = new Bundle();
-            bundle.putString(TaskDetailFragment.EXTRA_TASK_ID, taskId);
-            taskDetailFrag.setArguments(bundle);
-
+        // Add fragment to activity unless there is a saved state (orientation change), in which
+        // case the system will recreate the Fragment automatically
+        if (savedInstanceState == null) {
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    taskDetailFrag, R.id.contentFrame);
+                    TaskDetailFragment.newInstance(taskId), R.id.contentFrame);
         }
     }
 

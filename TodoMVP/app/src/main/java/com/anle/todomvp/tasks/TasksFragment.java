@@ -33,7 +33,6 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.anle.todomvp.taskdetail.TaskDetailFragment.EXTRA_TASK_ID;
 import static com.anle.todomvp.taskdetail.TaskDetailFragment.REQUEST_EDIT_TASK;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -320,7 +319,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public void showDetailTaskUI(String taskId) {
         Intent intent = new Intent(getContext(), TaskDetailActivity.class);
-        intent.putExtra(EXTRA_TASK_ID, taskId);
+        intent.putExtra(TaskDetailActivity.EXTRA_TASK_ID, taskId);
         startActivityForResult(intent, REQUEST_EDIT_TASK);
     }
 
