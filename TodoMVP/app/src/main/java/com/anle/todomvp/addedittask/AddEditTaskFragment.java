@@ -58,10 +58,9 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
                             mTitle.getText().toString(),
                             mContent.getText().toString());
                 } else {
-                    mUserActionListener.updateTask(
-                            getArguments().getString(ARGUMENT_EDIT_TASK_ID),
-                            mTitle.getText().toString(),
-                            mContent.getText().toString());
+                    mUserActionListener.updateTask(mTitle.getText().toString(),
+                            mContent.getText().toString(),
+                            getArguments().getString(ARGUMENT_EDIT_TASK_ID));
                 }
 
             }
