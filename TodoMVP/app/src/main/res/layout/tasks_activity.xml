@@ -5,7 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".tasks.TasksActivity">
+    android:id="@+id/drawer_layout"
+    tools:context=".tasks.TasksActivity"
+    tools:openDrawer="start">
 
     <LinearLayout
         android:layout_width="match_parent"
