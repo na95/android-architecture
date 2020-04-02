@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface TasksContract {
 
-    interface View{
+    interface View {
 
         void setProgressIndicator(boolean active);
 
@@ -27,7 +27,7 @@ public interface TasksContract {
         void showCompletedTasksCleared();
     }
 
-    interface UserActionListener{
+    interface UserActionListener {
 
         void loadAllTasks(boolean forceUpdate);
 

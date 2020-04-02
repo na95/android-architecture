@@ -15,12 +15,13 @@ import java.util.Map;
  */
 public class FakeTasksRemoteDataSource implements TasksDataSource {
 
+    private static final Map<String, Task> TASKS_SERVICE_DATA = new LinkedHashMap<>();
+    
     private static FakeTasksRemoteDataSource INSTANCE;
 
-    private static final Map<String, Task> TASKS_SERVICE_DATA = new LinkedHashMap<>();
-
     // Prevent direct instantiation.
-    private FakeTasksRemoteDataSource() {}
+    private FakeTasksRemoteDataSource() {
+    }
 
     public static FakeTasksRemoteDataSource getInstance() {
         if (INSTANCE == null) {

@@ -53,16 +53,14 @@ public class TasksFragment extends Fragment implements TasksContract.View {
      */
     final static int COMPLETED_TASKS = 2;
 
+    private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
+    
+    private static final int REQUEST_ADD_TASK = 1;
     /**
      * Must be one of the following: {@link #ALL_TASKS}, {@link #ACTIVE_TASKS},
      * {@link #COMPLETED_TASKS}.
      */
     private int mCurrentFiltering;
-
-    private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
-
-    private static final int REQUEST_ADD_TASK = 1;
-
     private TasksAdapter mListAdapter;
 
     private ListView mListView;
@@ -92,7 +90,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         @Override
         public void onCompleteTaskClick(Task completedTask) {
             mUserActionsListener.completeTask(completedTask);
-         }
+        }
 
         @Override
         public void onActivateTaskClick(Task activatedTask) {
@@ -100,7 +98,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         }
     };
 
-    public TasksFragment () {
+    public TasksFragment() {
         // Requires empty public constructor, to prevent another same constructor name
     }
 
@@ -143,8 +141,8 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         } else {
             mUserActionsListener.loadAllTasks(false);
         }
-        //TODO changed mFirstLoad from true to false to test only local data
-        mFirstLoad = false;
+
+        mFirstLoad = true;
     }
 
     @Override
@@ -378,6 +376,15 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         }
     }
 
+    public interface TaskItemListener {
+
+        void onTaskClick(Task clickedTask);
+
+        void onCompleteTaskClick(Task completedTask);
+
+        void onActivateTaskClick(Task activatedTask);
+    }
+
     private static class TasksAdapter extends BaseAdapter {
 
         private List<Task> mTasks;
@@ -460,15 +467,6 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
             return rowView;
         }
-    }
-
-    public interface TaskItemListener {
-
-        void onTaskClick(Task clickedTask);
-
-        void onCompleteTaskClick(Task completedTask);
-
-        void onActivateTaskClick(Task activatedTask);
     }
 
 }

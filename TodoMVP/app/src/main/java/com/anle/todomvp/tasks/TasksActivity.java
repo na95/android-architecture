@@ -1,18 +1,18 @@
 package com.anle.todomvp.tasks;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.MenuItem;
+
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.MenuItem;
-
+import com.anle.todomvp.R;
 import com.anle.todomvp.statistics.StatisticsActivity;
 import com.anle.todomvp.util.ActivityUtils;
-import com.anle.todomvp.R;
 import com.google.android.material.navigation.NavigationView;
 
 public class TasksActivity extends AppCompatActivity {
@@ -41,7 +41,7 @@ public class TasksActivity extends AppCompatActivity {
         mDrawerLayout.setStatusBarBackground(R.color.colorPrimaryDark);
         NavigationView navigationView = findViewById(R.id.nav_view);
         if (navigationView != null) {
-           setupDrawerContent(navigationView);
+            setupDrawerContent(navigationView);
         }
     }
 

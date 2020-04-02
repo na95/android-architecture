@@ -2,12 +2,9 @@ package com.anle.todomvp.taskdetail;
 
 import androidx.annotation.Nullable;
 
-import com.anle.todomvp.data.Task;
-import com.anle.todomvp.data.source.TasksDataSource;
-
 public interface TaskDetailContract {
 
-    interface View{
+    interface View {
 
         void setProgressIndicator(boolean active);
 

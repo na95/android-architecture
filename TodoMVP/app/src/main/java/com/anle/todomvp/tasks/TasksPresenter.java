@@ -1,14 +1,10 @@
 package com.anle.todomvp.tasks;
 
-import android.content.Context;
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.anle.todomvp.data.Task;
 import com.anle.todomvp.data.source.TasksDataSource;
 import com.anle.todomvp.data.source.TasksRepository;
-import com.anle.todomvp.data.source.local.TasksDbHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +27,12 @@ public class TasksPresenter implements TasksContract.UserActionListener {
 
     @Override
     public void loadAllTasks(boolean forceUpdate) {
-        loadTasks(forceUpdate,true, ALL_TASKS);
+        loadTasks(forceUpdate, true, ALL_TASKS);
     }
 
     @Override
     public void loadActiveTasks(boolean forceUpdate) {
-        loadTasks(forceUpdate,true, ACTIVE_TASKS);
+        loadTasks(forceUpdate, true, ACTIVE_TASKS);
     }
 
     @Override
@@ -45,9 +41,9 @@ public class TasksPresenter implements TasksContract.UserActionListener {
     }
 
     /**
-     * @param forceUpdate Pass in true to refresh the data in the {@link TasksDataSource}
+     * @param forceUpdate   Pass in true to refresh the data in the {@link TasksDataSource}
      * @param showLoadingUI Pass in true to display a loading icon in the UI
-     * @param requestType Corresponds to the position of the Navigation Spinner
+     * @param requestType   Corresponds to the position of the Navigation Spinner
      */
     private void loadTasks(boolean forceUpdate, final boolean showLoadingUI, final int requestType) {
 
@@ -65,7 +61,7 @@ public class TasksPresenter implements TasksContract.UserActionListener {
                 List<Task> tasksToShow = new ArrayList<Task>();
 
                 // We filter the tasks based on the requestType
-                for (Task task: tasks) {
+                for (Task task : tasks) {
                     switch (requestType) {
                         case ALL_TASKS:
                             tasksToShow.add(task);
@@ -122,14 +118,12 @@ public class TasksPresenter implements TasksContract.UserActionListener {
 
     @Override
     public void completeTask(Task task) {
-        //TODO
         mTasksRepository.completeTask(task);
         mTasksView.showTaskMarkedComplete();
     }
 
     @Override
     public void activateTask(Task task) {
-        //TODO
         mTasksRepository.activateTask(task);
         mTasksView.showTaskMarkedActive();
     }

@@ -2,7 +2,7 @@ package com.anle.todomvp.addedittask;
 
 public interface AddEditTaskContract {
 
-    interface View{
+    interface View {
 
         void setUserActionListener(UserActionsListener listener);
 
@@ -15,7 +15,7 @@ public interface AddEditTaskContract {
         void setContent(String content);
     }
 
-    interface UserActionsListener{
+    interface UserActionsListener {
 
         void updateTask(String title, String content, String taskId);
 
