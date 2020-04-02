@@ -9,11 +9,10 @@ import androidx.annotation.NonNull;
 
 import com.anle.todomvp.data.Task;
 import com.anle.todomvp.data.source.TasksDataSource;
+import com.anle.todomvp.data.source.local.TasksPersistenceContract.TaskEntry;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.anle.todomvp.data.source.local.TasksPersistenceContract.TaskEntry;
-
 
 import static androidx.core.util.Preconditions.checkNotNull;
 
@@ -97,7 +96,7 @@ public class TasksLocalDataSource implements TasksDataSource {
         };
 
         String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-        String[] selectionArgs = { taskId };
+        String[] selectionArgs = {taskId};
 
         Cursor c = db.query(
                 TaskEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
@@ -152,7 +151,7 @@ public class TasksLocalDataSource implements TasksDataSource {
         values.put(TaskEntry.COLUMN_NAME_COMPLETED, true);
 
         String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-        String[] selectionArgs = { task.getId() };
+        String[] selectionArgs = {task.getId()};
 
         db.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
 
@@ -174,7 +173,7 @@ public class TasksLocalDataSource implements TasksDataSource {
         values.put(TaskEntry.COLUMN_NAME_COMPLETED, false);
 
         String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-        String[] selectionArgs = { task.getId() };
+        String[] selectionArgs = {task.getId()};
 
         db.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
 
@@ -192,7 +191,7 @@ public class TasksLocalDataSource implements TasksDataSource {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         String selection = TaskEntry.COLUMN_NAME_COMPLETED + " LIKE ?";
-        String[] selectionArgs = { "1" };
+        String[] selectionArgs = {"1"};
 
         db.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);
 
@@ -219,7 +218,7 @@ public class TasksLocalDataSource implements TasksDataSource {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-        String[] selectionArgs = { taskId };
+        String[] selectionArgs = {taskId};
 
         db.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);
 

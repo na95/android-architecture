@@ -31,4 +31,5 @@ ext {
     // App dependencies
     guavaVersion = '18.0'
     junitVersion = '4.12'
+    roomVersion = '1.0.0-alpha4'
 }

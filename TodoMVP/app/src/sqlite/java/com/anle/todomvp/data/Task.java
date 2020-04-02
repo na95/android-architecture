@@ -16,10 +16,11 @@ public class Task {
 
     /**
      * Use this constructor to create new active task
+     *
      * @param mTitle
      * @param mContent
      */
-    public Task (@Nullable String mTitle, @Nullable String mContent) {
+    public Task(@Nullable String mTitle, @Nullable String mContent) {
         this.mId = UUID.randomUUID().toString();
         this.mTitle = mTitle;
         this.mContent = mContent;
@@ -28,6 +29,7 @@ public class Task {
 
     /**
      * Use this constructor to create new task that has an Id (in db)
+     *
      * @param title
      * @param content
      * @param itemId
@@ -57,9 +59,17 @@ public class Task {
         return mId;
     }
 
+    public void setId(String mId) {
+        this.mId = mId;
+    }
+
     @Nullable
     public String getTitle() {
         return mTitle;
+    }
+
+    public void setTitle(@Nullable String _title) {
+        this.mTitle = _title;
     }
 
     @Nullable
@@ -67,20 +77,8 @@ public class Task {
         return mContent;
     }
 
-    public void setId(String mId) {
-        this.mId = mId;
-    }
-
-    public void setTitle(@Nullable String _title) {
-        this.mTitle = _title;
-    }
-
     public void setContent(@Nullable String mContent) {
         this.mContent = mContent;
-    }
-
-    public void setCompleted(boolean mCompleted) {
-        this.mCompleted = mCompleted;
     }
 
     public boolean isActive() {
@@ -89,6 +87,10 @@ public class Task {
 
     public boolean isCompleted() {
         return mCompleted;
+    }
+
+    public void setCompleted(boolean mCompleted) {
+        this.mCompleted = mCompleted;
     }
 
     public boolean isEmpty() {
@@ -108,7 +110,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task with title " + mTitle;
+        return "com.anle.todomvp.data.local.Task with title " + mTitle;
     }
 
     @Nullable
