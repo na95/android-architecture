@@ -2,10 +2,10 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "e9ad396cda93a3e0d17533bd5795d35d",
+    "identityHash": "478ce7dd102c9fd38a893c6ea9d9690a",
     "entities": [
       {
-        "tableName": "task",
+        "tableName": "tasks",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`entryid` TEXT NOT NULL, `title` TEXT, `content` TEXT, `completed` INTEGER NOT NULL, PRIMARY KEY(`entryid`))",
         "fields": [
           {
@@ -45,7 +45,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"e9ad396cda93a3e0d17533bd5795d35d\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"478ce7dd102c9fd38a893c6ea9d9690a\")"
     ]
   }
 }

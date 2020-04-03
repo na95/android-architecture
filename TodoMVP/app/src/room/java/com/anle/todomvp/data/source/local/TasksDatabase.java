@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase;
 
 import com.anle.todomvp.data.Task;
 
-@Database(entities = {Task.class}, version = 2)
+@Database(entities = {Task.class}, version = 1)
 public abstract class TasksDatabase extends RoomDatabase {
 
     private static final Object sLock = new Object();
