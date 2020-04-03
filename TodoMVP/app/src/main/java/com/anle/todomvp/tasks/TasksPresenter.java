@@ -1,7 +1,10 @@
 package com.anle.todomvp.tasks;
 
+import android.app.Activity;
+
 import androidx.annotation.NonNull;
 
+import com.anle.todomvp.addedittask.AddEditTaskActivity;
 import com.anle.todomvp.data.Task;
 import com.anle.todomvp.data.source.TasksDataSource;
 import com.anle.todomvp.data.source.TasksRepository;
@@ -9,9 +12,6 @@ import com.anle.todomvp.data.source.TasksRepository;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.anle.todomvp.tasks.TasksFragment.ACTIVE_TASKS;
-import static com.anle.todomvp.tasks.TasksFragment.ALL_TASKS;
-import static com.anle.todomvp.tasks.TasksFragment.COMPLETED_TASKS;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class TasksPresenter implements TasksContract.UserActionListener {
@@ -20,32 +20,35 @@ public class TasksPresenter implements TasksContract.UserActionListener {
 
     private final TasksContract.View mTasksView;
 
+    @NonNull
+    private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
+
     public TasksPresenter(@NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
+        mTasksView.setPresenter(this);
     }
 
     @Override
-    public void loadAllTasks(boolean forceUpdate) {
-        loadTasks(forceUpdate, true, ALL_TASKS);
+    public void loadTasks(boolean forceUpdate) {
+        loadTasks(forceUpdate, true);
     }
 
     @Override
     public void loadActiveTasks(boolean forceUpdate) {
-        loadTasks(forceUpdate, true, ACTIVE_TASKS);
+        loadTasks(forceUpdate, true);
     }
 
     @Override
     public void loadCompletedTasks(boolean forceUpdate) {
-        loadTasks(forceUpdate, true, COMPLETED_TASKS);
+        loadTasks(forceUpdate, true);
     }
 
     /**
      * @param forceUpdate   Pass in true to refresh the data in the {@link TasksDataSource}
      * @param showLoadingUI Pass in true to display a loading icon in the UI
-     * @param requestType   Corresponds to the position of the Navigation Spinner
      */
-    private void loadTasks(boolean forceUpdate, final boolean showLoadingUI, final int requestType) {
+    private void loadTasks(boolean forceUpdate, final boolean showLoadingUI) {
 
         if (showLoadingUI) {
             mTasksView.setProgressIndicator(true);
@@ -62,7 +65,7 @@ public class TasksPresenter implements TasksContract.UserActionListener {
 
                 // We filter the tasks based on the requestType
                 for (Task task : tasks) {
-                    switch (requestType) {
+                    switch (mCurrentFiltering) {
                         case ALL_TASKS:
                             tasksToShow.add(task);
                             break;
@@ -83,7 +86,7 @@ public class TasksPresenter implements TasksContract.UserActionListener {
                 }
 
                 // The View may not be on screen anymore when this callback is returned
-                if (mTasksView.isInactive()) {
+                if (mTasksView.isActive()) {
                     return;
                 }
 
@@ -91,13 +94,13 @@ public class TasksPresenter implements TasksContract.UserActionListener {
                     mTasksView.setProgressIndicator(false);
                 }
 
-                mTasksView.showTasks(tasksToShow);
-            }
+                processTasks(tasksToShow);
+        }
 
             @Override
             public void onDataNotAvailable() {
                 // The View may not be on screen anymore when this callback is returned
-                if (mTasksView.isInactive()) {
+                if (mTasksView.isActive()) {
                     return;
                 }
 
@@ -134,4 +137,67 @@ public class TasksPresenter implements TasksContract.UserActionListener {
         mTasksView.showCompletedTasksCleared();
     }
 
+    /**
+     * Sets the current task filtering type.
+     *
+     * @param requestType Can be {@link TasksFilterType#ALL_TASKS},
+     *                    {@link TasksFilterType#COMPLETED_TASKS}, or
+     *                    {@link TasksFilterType#ACTIVE_TASKS}
+     */
+    @Override
+    public void setFiltering(@NonNull TasksFilterType requestType) {
+        mCurrentFiltering = requestType;
+    }
+
+    @Override
+    public TasksFilterType getFiltering() {
+        return mCurrentFiltering;
+    }
+
+    private void processTasks(@NonNull List<Task> tasks) {
+        if (tasks.isEmpty()) {
+            // Show a message indicating there are no tasks for that filter type.
+            processEmptyTasks();
+        } else {
+            // Show the list of tasks
+            mTasksView.showTasks(tasks);
+            // Set the filter label's text.
+            showFilterLabel();
+        }
+    }
+    private void showFilterLabel() {
+        switch (mCurrentFiltering) {
+            case ACTIVE_TASKS:
+                mTasksView.showActiveFilterLabel();
+                break;
+            case COMPLETED_TASKS:
+                mTasksView.showCompletedFilterLabel();
+                break;
+            default:
+                mTasksView.showAllFilterLabel();
+                break;
+        }
+    }
+
+    private void processEmptyTasks() {
+        switch (mCurrentFiltering) {
+            case ACTIVE_TASKS:
+                mTasksView.showNoActiveTasks();
+                break;
+            case COMPLETED_TASKS:
+                mTasksView.showNoCompletedTasks();
+                break;
+            default:
+                mTasksView.showNoTasks();
+                break;
+        }
+    }
+
+    @Override
+    public void result(int requestCode, int resultCode) {
+        // If a task was successfully added, show snackbar
+        if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode && Activity.RESULT_OK == resultCode) {
+            mTasksView.showSuccessfullySavedMessage();
+        }
+    }
 }

@@ -9,7 +9,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 
+import com.anle.todomvp.Injection;
 import com.anle.todomvp.R;
 import com.anle.todomvp.statistics.StatisticsActivity;
 import com.anle.todomvp.util.ActivityUtils;
@@ -17,7 +19,11 @@ import com.google.android.material.navigation.NavigationView;
 
 public class TasksActivity extends AppCompatActivity {
 
+    private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
+
     private DrawerLayout mDrawerLayout;
+
+    private TasksPresenter mTasksPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,11 +37,6 @@ public class TasksActivity extends AppCompatActivity {
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
 
-        if (null == savedInstanceState) {
-            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    TasksFragment.newInstance(), R.id.contentFrame);
-        }
-
         // Set up the navigation drawer.
         mDrawerLayout = findViewById(R.id.drawer_layout);
         mDrawerLayout.setStatusBarBackground(R.color.colorPrimaryDark);
@@ -43,6 +44,32 @@ public class TasksActivity extends AppCompatActivity {
         if (navigationView != null) {
             setupDrawerContent(navigationView);
         }
+
+
+        TasksFragment tasksFragment =
+                (TasksFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+        if (tasksFragment == null) {
+            // Create the fragment
+            tasksFragment = TasksFragment.newInstance();
+            ActivityUtils.addFragmentToActivity(
+                    getSupportFragmentManager(), tasksFragment, R.id.contentFrame);
+        }
+
+
+        mTasksPresenter = new TasksPresenter(Injection.provideTasksRepository(getApplicationContext()), tasksFragment);
+        // Load previously saved state, if available.
+        if (savedInstanceState != null) {
+            TasksFilterType currentFiltering =
+                    (TasksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
+            mTasksPresenter.setFiltering(currentFiltering);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putSerializable(CURRENT_FILTERING_KEY, mTasksPresenter.getFiltering());
+
+        super.onSaveInstanceState(outState);
     }
 
     private void setupDrawerContent(NavigationView navigationView) {

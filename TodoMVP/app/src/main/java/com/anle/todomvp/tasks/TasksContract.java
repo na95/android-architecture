@@ -1,12 +1,13 @@
 package com.anle.todomvp.tasks;
 
+import com.anle.todomvp.BaseView;
 import com.anle.todomvp.data.Task;
 
 import java.util.List;
 
 public interface TasksContract {
 
-    interface View {
+    interface View extends BaseView<UserActionListener> {
 
         void setProgressIndicator(boolean active);
 
@@ -22,14 +23,31 @@ public interface TasksContract {
 
         void showLoadingTasksError();
 
-        boolean isInactive();
-
         void showCompletedTasksCleared();
+
+        void showActiveFilterLabel();
+
+        void showCompletedFilterLabel();
+
+        void showAllFilterLabel();
+
+        void showNoTasks();
+
+        void showNoActiveTasks();
+
+        void showNoCompletedTasks();
+
+        void showSuccessfullySavedMessage();
+
+        boolean isActive();
+
     }
 
     interface UserActionListener {
 
-        void loadAllTasks(boolean forceUpdate);
+        void result(int requestCode, int resultCode);
+
+        void loadTasks(boolean forceUpdate);
 
         void addNewTask();
 
@@ -44,5 +62,9 @@ public interface TasksContract {
         void loadCompletedTasks(boolean forceUpdate);
 
         void clearCompletedTasks();
+
+        void setFiltering(TasksFilterType requestType);
+
+        TasksFilterType getFiltering();
     }
 }
