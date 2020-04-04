@@ -1,6 +1,5 @@
 package com.anle.todomvp.tasks;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -23,7 +22,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.anle.todomvp.Injection;
 import com.anle.todomvp.R;
 import com.anle.todomvp.addedittask.AddEditTaskActivity;
 import com.anle.todomvp.data.Task;
@@ -288,7 +286,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public void showAddEditTaskUI() {
         Intent intent = new Intent(getContext(), AddEditTaskActivity.class);
-        startActivityForResult(intent,  AddEditTaskActivity.REQUEST_ADD_TASK);
+        startActivityForResult(intent, AddEditTaskActivity.REQUEST_ADD_TASK);
     }
 
     @Override

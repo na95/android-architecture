@@ -95,7 +95,7 @@ public class TasksPresenter implements TasksContract.UserActionListener {
                 }
 
                 processTasks(tasksToShow);
-        }
+            }
 
             @Override
             public void onDataNotAvailable() {
@@ -137,6 +137,11 @@ public class TasksPresenter implements TasksContract.UserActionListener {
         mTasksView.showCompletedTasksCleared();
     }
 
+    @Override
+    public TasksFilterType getFiltering() {
+        return mCurrentFiltering;
+    }
+
     /**
      * Sets the current task filtering type.
      *
@@ -147,11 +152,6 @@ public class TasksPresenter implements TasksContract.UserActionListener {
     @Override
     public void setFiltering(@NonNull TasksFilterType requestType) {
         mCurrentFiltering = requestType;
-    }
-
-    @Override
-    public TasksFilterType getFiltering() {
-        return mCurrentFiltering;
     }
 
     private void processTasks(@NonNull List<Task> tasks) {
@@ -165,6 +165,7 @@ public class TasksPresenter implements TasksContract.UserActionListener {
             showFilterLabel();
         }
     }
+
     private void showFilterLabel() {
         switch (mCurrentFiltering) {
             case ACTIVE_TASKS:
