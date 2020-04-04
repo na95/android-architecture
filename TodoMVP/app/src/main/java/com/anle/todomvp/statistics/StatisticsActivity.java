@@ -10,7 +10,10 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.anle.todomvp.Injection;
 import com.anle.todomvp.R;
+import com.anle.todomvp.taskdetail.TaskDetailFragment;
+import com.anle.todomvp.taskdetail.TaskDetailPresenter;
 import com.anle.todomvp.tasks.TasksActivity;
 import com.anle.todomvp.util.ActivityUtils;
 import com.google.android.material.navigation.NavigationView;
@@ -18,6 +21,8 @@ import com.google.android.material.navigation.NavigationView;
 public class StatisticsActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
+
+    private StatisticsContract.UserActionsListener mStatisticsPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +37,6 @@ public class StatisticsActivity extends AppCompatActivity {
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
 
-        ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                StatisticsFragment.newInstance(), R.id.contentFrame);
         // Set up the navigation drawer.
         mDrawerLayout = findViewById(R.id.drawer_layout);
         mDrawerLayout.setStatusBarBackground(R.color.colorPrimaryDark);
@@ -41,6 +44,23 @@ public class StatisticsActivity extends AppCompatActivity {
         if (navigationView != null) {
             setupDrawerContent(navigationView);
         }
+
+        StatisticsFragment statisticsFragment =
+                (StatisticsFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+
+
+        if (statisticsFragment == null) {
+
+            statisticsFragment = StatisticsFragment.newInstance();
+            // Create the fragment
+            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                    statisticsFragment, R.id.contentFrame);
+        }
+
+        mStatisticsPresenter = new StatisticsPresenter(
+                Injection.provideTasksRepository(getApplicationContext()),
+                statisticsFragment);
+
     }
 
     private void setupDrawerContent(NavigationView navigationView) {

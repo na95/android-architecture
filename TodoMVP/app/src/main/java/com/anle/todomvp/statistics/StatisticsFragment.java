@@ -12,6 +12,8 @@ import androidx.fragment.app.Fragment;
 import com.anle.todomvp.Injection;
 import com.anle.todomvp.R;
 
+import static androidx.core.util.Preconditions.checkNotNull;
+
 public class StatisticsFragment extends Fragment implements StatisticsContract.View {
 
     private TextView mStatisticsTV;
@@ -20,13 +22,6 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
 
     public static StatisticsFragment newInstance() {
         return new StatisticsFragment();
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mActionsListener = new StatisticsPresenter(
-                Injection.provideTasksRepository(getContext()), this);
     }
 
     @Nullable
@@ -73,5 +68,10 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     @Override
     public boolean isInactive() {
         return !isAdded();
+    }
+
+    @Override
+    public void setPresenter(StatisticsContract.UserActionsListener presenter) {
+        mActionsListener = checkNotNull(presenter);
     }
 }

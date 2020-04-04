@@ -1,9 +1,11 @@
 package com.anle.todomvp.statistics;
 
 
+import com.anle.todomvp.BaseView;
+
 public interface StatisticsContract {
 
-    interface View {
+    interface View extends BaseView<UserActionsListener> {
 
         void setProgressIndicator(boolean active);
 
