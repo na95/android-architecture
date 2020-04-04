@@ -6,12 +6,15 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.anle.todomvp.Injection;
 import com.anle.todomvp.R;
 import com.anle.todomvp.util.ActivityUtils;
 
 public class TaskDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_TASK_ID = "TASK_ID";
+
+    private TaskDetailContract.UserActionsListener mTaskDetailPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,12 +31,16 @@ public class TaskDetailActivity extends AppCompatActivity {
         // Get the requested task id
         String taskId = getIntent().getStringExtra(EXTRA_TASK_ID);
 
-        // Add fragment to activity unless there is a saved state (orientation change), in which
-        // case the system will recreate the Fragment automatically
-        if (savedInstanceState == null) {
-            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    TaskDetailFragment.newInstance(taskId), R.id.contentFrame);
+        TaskDetailFragment taskDetailFragment =
+                (TaskDetailFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+        if (taskDetailFragment == null) {
+            // Create the fragment
+            taskDetailFragment = TaskDetailFragment.newInstance(taskId);
+            ActivityUtils.addFragmentToActivity(
+                    getSupportFragmentManager(), taskDetailFragment, R.id.contentFrame);
         }
+
+        mTaskDetailPresenter = new TaskDetailPresenter(Injection.provideTasksRepository(getApplicationContext()), taskDetailFragment);
     }
 
     @Override

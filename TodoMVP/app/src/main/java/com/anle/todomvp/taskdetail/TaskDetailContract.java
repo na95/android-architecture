@@ -2,9 +2,11 @@ package com.anle.todomvp.taskdetail;
 
 import androidx.annotation.Nullable;
 
+import com.anle.todomvp.BaseView;
+
 public interface TaskDetailContract {
 
-    interface View {
+    interface View extends BaseView<UserActionsListener> {
 
         void setProgressIndicator(boolean active);
 

@@ -14,6 +14,7 @@ public class TaskDetailPresenter implements TaskDetailContract.UserActionsListen
     public TaskDetailPresenter(@NonNull TasksDataSource taskRepository, @NonNull TaskDetailContract.View taskDetailView) {
         mTasksRepository = taskRepository;
         mTaskDetailView = taskDetailView;
+        mTaskDetailView.setPresenter(this);
     }
 
     @Override

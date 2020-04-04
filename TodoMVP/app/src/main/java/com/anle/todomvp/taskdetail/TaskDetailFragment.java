@@ -16,12 +16,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.anle.todomvp.Injection;
 import com.anle.todomvp.R;
 import com.anle.todomvp.addedittask.AddEditTaskActivity;
 import com.anle.todomvp.addedittask.AddEditTaskFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+
+import static androidx.core.util.Preconditions.checkNotNull;
 
 public class TaskDetailFragment extends Fragment implements TaskDetailContract.View {
 
@@ -44,13 +45,6 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         TaskDetailFragment fragment = new TaskDetailFragment();
         fragment.setArguments(arguments);
         return fragment;
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        mUserActionsListener = new TaskDetailPresenter(Injection.provideTasksRepository(getContext()), this);
     }
 
     @Override
@@ -201,4 +195,8 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         return !isAdded();
     }
 
+    @Override
+    public void setPresenter(TaskDetailContract.UserActionsListener presenter) {
+        mUserActionsListener = checkNotNull(presenter);
+    }
 }
