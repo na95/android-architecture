@@ -1,10 +1,10 @@
 package com.anle.todomvp.addedittask;
 
+import com.anle.todomvp.BaseView;
+
 public interface AddEditTaskContract {
 
-    interface View {
-
-        void setUserActionListener(UserActionsListener listener);
+    interface View extends BaseView<UserActionsListener> {
 
         void showTasksList();
 
@@ -17,10 +17,8 @@ public interface AddEditTaskContract {
 
     interface UserActionsListener {
 
-        void updateTask(String title, String content, String taskId);
+        void saveTask(String title, String content);
 
-        void createTask(String title, String content);
-
-        void populateTask(String taskId);
+        void populateTask();
     }
 }

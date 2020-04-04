@@ -2,16 +2,22 @@ package com.anle.todomvp.addedittask;
 
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.anle.todomvp.Injection;
 import com.anle.todomvp.R;
 import com.anle.todomvp.util.ActivityUtils;
 
 public class AddEditTaskActivity extends AppCompatActivity {
 
     public static final int REQUEST_ADD_TASK = 1;
+
+    private AddEditTaskContract.UserActionsListener mAddEditTaskPresenter;
+
+    private ActionBar mActionBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,31 +27,37 @@ public class AddEditTaskActivity extends AppCompatActivity {
         // Set up the toolbar.
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowHomeEnabled(true);
+        mActionBar = getSupportActionBar();
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+        mActionBar.setDisplayShowHomeEnabled(true);
 
-        if (null == savedInstanceState) {
-            // If there's a Task ID in the Bundle, this is an edit. Otherwise it's a new task.
-            if (getIntent().hasExtra(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID)) {
-                String taskId = getIntent().getStringExtra(
-                        AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
-                actionBar.setTitle(R.string.edit_task);
-                AddEditTaskFragment addEditTaskFragment = AddEditTaskFragment.newInstance();
-                Bundle bundle = new Bundle();
-                bundle.putString(AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID, taskId);
-                addEditTaskFragment.setArguments(bundle);
-                ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                        addEditTaskFragment, R.id.contentFrame);
-            } else {
-                actionBar.setTitle(R.string.add_task);
-                ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                        AddEditTaskFragment.newInstance(), R.id.contentFrame);
-            }
+        AddEditTaskFragment addEditTaskFragment = (AddEditTaskFragment) getSupportFragmentManager().
+                findFragmentById(R.id.contentFrame);
+
+        String taskId = getIntent().getStringExtra(
+                AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID);
+
+        setToolbarTitle(taskId);
+
+        if (addEditTaskFragment == null) {
+            addEditTaskFragment = AddEditTaskFragment.newInstance();
+            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                    addEditTaskFragment, R.id.contentFrame);
         }
+
+        mAddEditTaskPresenter = new AddEditTaskPresenter(taskId,
+                Injection.provideTasksRepository(getApplicationContext()),
+                addEditTaskFragment);
 
     }
 
+    private void setToolbarTitle(@Nullable String taskId) {
+        if(taskId == null) {
+            mActionBar.setTitle(R.string.add_task);
+        } else {
+            mActionBar.setTitle(R.string.edit_task);
+        }
+    }
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();

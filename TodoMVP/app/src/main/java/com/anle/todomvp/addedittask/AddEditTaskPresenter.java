@@ -14,20 +14,46 @@ public class AddEditTaskPresenter implements AddEditTaskContract.UserActionsList
 
     private AddEditTaskContract.View mAddEditTaskView;
 
-    public AddEditTaskPresenter(@NonNull TasksDataSource tasksRepository,
+    private String mTaskId;
+
+    public AddEditTaskPresenter(String taskId,
+                                @NonNull TasksDataSource tasksRepository,
                                 @NonNull AddEditTaskContract.View addTaskView) {
+        mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository);
         mAddEditTaskView = checkNotNull(addTaskView);
-        mAddEditTaskView.setUserActionListener(this);
+        mAddEditTaskView.setPresenter(this);
     }
 
     @Override
-    public void updateTask(String title, String content, String taskId) {
-        mTasksRepository.saveTask(new Task(title, content, taskId));
+    public void saveTask(String title, String content)
+    {
+        if (isNewTask()) {
+            createTask(title, content);
+        } else {
+            updateTask(title, content);
+        }
+    }
+
+    @Override
+    public void populateTask() {
+        if (!isNewTask()) {
+            mTasksRepository.getTask(mTaskId, this); // this = GetTaskCallback is implemented inside this class
+        }
+    }
+
+    private boolean isNewTask(){
+        return mTaskId == null;
+    }
+
+    public void updateTask(String title, String content) {
+        if (isNewTask()) {
+            throw new RuntimeException("updateTask() was called but task is new.");
+        }
+        mTasksRepository.saveTask(new Task(title, content, mTaskId));
         mAddEditTaskView.showTasksList(); // After an edit, go back to the list.
     }
 
-    @Override
     public void createTask(String title, String content) {
         Task newTask = new Task(title, content);
         if (newTask.isEmpty()) {
@@ -36,11 +62,6 @@ public class AddEditTaskPresenter implements AddEditTaskContract.UserActionsList
             mTasksRepository.saveTask(newTask);
             mAddEditTaskView.showTasksList();
         }
-    }
-
-    @Override
-    public void populateTask(String taskId) {
-        mTasksRepository.getTask(taskId, this);
     }
 
     @Override

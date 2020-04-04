@@ -15,6 +15,8 @@ import com.anle.todomvp.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import static androidx.core.util.Preconditions.checkNotNull;
+
 public class AddEditTaskFragment extends Fragment implements AddEditTaskContract.View {
 
     public static final String ARGUMENT_EDIT_TASK_ID = "ARGUMENT_EDIT_TASK_ID";
@@ -35,35 +37,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Override
     public void onResume() {
         super.onResume();
-        if (!isNewTask()) {
-            String taskId = getArguments().getString(ARGUMENT_EDIT_TASK_ID);
-            mUserActionListener.populateTask(taskId);
-        }
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        mUserActionListener = new AddEditTaskPresenter(Injection.provideTasksRepository(getContext()), this);
-
-        FloatingActionButton fab = getActivity().findViewById(R.id.fab_edit_task_done);
-        fab.setImageResource(R.drawable.ic_done);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isNewTask()) {
-                    mUserActionListener.createTask(
-                            mTitle.getText().toString(),
-                            mContent.getText().toString());
-                } else {
-                    mUserActionListener.updateTask(mTitle.getText().toString(),
-                            mContent.getText().toString(),
-                            getArguments().getString(ARGUMENT_EDIT_TASK_ID));
-                }
-
-            }
-        });
+        mUserActionListener.populateTask();
     }
 
     @Nullable
@@ -73,6 +47,11 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         View root = inflater.inflate(R.layout.add_edit_task_fragment, container, false);
         mTitle = root.findViewById(R.id.add_task_title);
         mContent = root.findViewById(R.id.add_task_description);
+
+        FloatingActionButton fab = getActivity().findViewById(R.id.fab_edit_task_done);
+        fab.setImageResource(R.drawable.ic_done);
+        fab.setOnClickListener(__ -> mUserActionListener.saveTask(mTitle.getText().toString(),
+                mContent.getText().toString()));
 
         setHasOptionsMenu(true);
         setRetainInstance(true);
@@ -91,8 +70,8 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     }
 
     @Override
-    public void setUserActionListener(AddEditTaskContract.UserActionsListener listener) {
-        mUserActionListener = listener;
+    public void setPresenter(AddEditTaskContract.UserActionsListener presenter) {
+        mUserActionListener = checkNotNull(presenter);
     }
 
     @Override
@@ -105,8 +84,5 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         mContent.setText(description);
     }
 
-    private boolean isNewTask() {
-        return getArguments() == null || !getArguments().containsKey(ARGUMENT_EDIT_TASK_ID);
-    }
 
 }
