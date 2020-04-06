@@ -5,7 +5,7 @@ import com.anle.todomvp.BaseView;
 
 public interface StatisticsContract {
 
-    interface View extends BaseView<UserActionsListener> {
+    interface View extends BaseView<Presenter> {
 
         void setProgressIndicator(boolean active);
 
@@ -16,7 +16,7 @@ public interface StatisticsContract {
         boolean isInactive();
     }
 
-    interface UserActionsListener {
+    interface Presenter {
 
         void loadStatistics();
     }

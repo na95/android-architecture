@@ -16,20 +16,6 @@ import java.util.List;
  */
 public interface TasksDataSource {
 
-    interface LoadTasksCallback {
-
-        void onTasksLoaded(List<Task> tasks);
-
-        void onDataNotAvailable();
-    }
-
-    interface GetTaskCallback {
-
-        void onTaskLoaded(Task task);
-
-        void onDataNotAvailable();
-    }
-
     void getTasks(@NonNull LoadTasksCallback callback);
 
     void getTask(@NonNull String taskId, @NonNull GetTaskCallback callback);
@@ -51,4 +37,18 @@ public interface TasksDataSource {
     void deleteAllTasks();
 
     void deleteTask(@NonNull String taskId);
+
+    interface LoadTasksCallback {
+
+        void onTasksLoaded(List<Task> tasks);
+
+        void onDataNotAvailable();
+    }
+
+    interface GetTaskCallback {
+
+        void onTaskLoaded(Task task);
+
+        void onDataNotAvailable();
+    }
 }

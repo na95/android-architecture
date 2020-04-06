@@ -16,7 +16,7 @@ import java.util.Map;
 public class FakeTasksRemoteDataSource implements TasksDataSource {
 
     private static final Map<String, Task> TASKS_SERVICE_DATA = new LinkedHashMap<>();
-    
+
     private static FakeTasksRemoteDataSource INSTANCE;
 
     // Prevent direct instantiation.

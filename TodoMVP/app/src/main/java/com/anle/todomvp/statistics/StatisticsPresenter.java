@@ -10,7 +10,7 @@ import java.util.List;
 
 import static androidx.core.util.Preconditions.checkNotNull;
 
-public class StatisticsPresenter implements StatisticsContract.UserActionsListener {
+public class StatisticsPresenter implements StatisticsContract.Presenter {
 
 
     private final TasksRepository mTasksRepository;

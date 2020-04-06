@@ -30,7 +30,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     public static final int REQUEST_EDIT_TASK = 1;
 
-    TaskDetailContract.UserActionsListener mUserActionsListener;
+    TaskDetailContract.Presenter mPresenter;
 
     private CheckBox mTaskDetailCompleteStatus;
 
@@ -83,7 +83,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
             @Override
             public void onClick(View v) {
                 String taskId = getArguments().getString(AGRUMENT_TASK_ID);
-                mUserActionsListener.editTask(taskId);
+                mPresenter.editTask(taskId);
             }
         });
 
@@ -101,7 +101,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         switch (item.getItemId()) {
             case R.id.menu_delete:
                 String taskId = getArguments().getString(AGRUMENT_TASK_ID);
-                mUserActionsListener.deleteTask(taskId);
+                mPresenter.deleteTask(taskId);
                 return true;
         }
         return false;
@@ -110,7 +110,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     private void openTask() {
         String taskId = getArguments().getString(AGRUMENT_TASK_ID);
-        mUserActionsListener.openTask(taskId);
+        mPresenter.openTask(taskId);
     }
 
     @Override
@@ -156,9 +156,9 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
             @Override
             public void onClick(View v) {
                 if (complete) {
-                    mUserActionsListener.activateTask(getArguments().getString(AGRUMENT_TASK_ID));
+                    mPresenter.activateTask(getArguments().getString(AGRUMENT_TASK_ID));
                 } else {
-                    mUserActionsListener.completeTask(getArguments().getString(AGRUMENT_TASK_ID));
+                    mPresenter.completeTask(getArguments().getString(AGRUMENT_TASK_ID));
                 }
             }
         });
@@ -196,7 +196,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     }
 
     @Override
-    public void setPresenter(TaskDetailContract.UserActionsListener presenter) {
-        mUserActionsListener = checkNotNull(presenter);
+    public void setPresenter(TaskDetailContract.Presenter presenter) {
+        mPresenter = checkNotNull(presenter);
     }
 }

@@ -12,8 +12,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.anle.todomvp.Injection;
 import com.anle.todomvp.R;
-import com.anle.todomvp.taskdetail.TaskDetailFragment;
-import com.anle.todomvp.taskdetail.TaskDetailPresenter;
 import com.anle.todomvp.tasks.TasksActivity;
 import com.anle.todomvp.util.ActivityUtils;
 import com.google.android.material.navigation.NavigationView;
@@ -22,7 +20,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
 
-    private StatisticsContract.UserActionsListener mStatisticsPresenter;
+    private StatisticsContract.Presenter mStatisticsPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

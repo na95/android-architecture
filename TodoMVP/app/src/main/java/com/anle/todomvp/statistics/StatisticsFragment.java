@@ -9,7 +9,6 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.anle.todomvp.Injection;
 import com.anle.todomvp.R;
 
 import static androidx.core.util.Preconditions.checkNotNull;
@@ -18,7 +17,7 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
 
     private TextView mStatisticsTV;
 
-    private StatisticsContract.UserActionsListener mActionsListener;
+    private StatisticsContract.Presenter mActionsListener;
 
     public static StatisticsFragment newInstance() {
         return new StatisticsFragment();
@@ -71,7 +70,7 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     }
 
     @Override
-    public void setPresenter(StatisticsContract.UserActionsListener presenter) {
+    public void setPresenter(StatisticsContract.Presenter presenter) {
         mActionsListener = checkNotNull(presenter);
     }
 }

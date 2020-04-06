@@ -14,7 +14,7 @@ public class TaskDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_TASK_ID = "TASK_ID";
 
-    private TaskDetailContract.UserActionsListener mTaskDetailPresenter;
+    private TaskDetailContract.Presenter mTaskDetailPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

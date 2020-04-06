@@ -58,22 +58,22 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     private boolean mFirstLoad = true;
 
-    private TasksContract.UserActionListener mUserActionsListener;
+    private TasksContract.UserActionListener mPresenter;
 
     private TaskItemListener mItemListener = new TaskItemListener() {
         @Override
         public void onTaskClick(Task clickedTask) {
-            mUserActionsListener.openTaskDetail(clickedTask);
+            mPresenter.openTaskDetail(clickedTask);
         }
 
         @Override
         public void onCompleteTaskClick(Task completedTask) {
-            mUserActionsListener.completeTask(completedTask);
+            mPresenter.completeTask(completedTask);
         }
 
         @Override
         public void onActivateTaskClick(Task activatedTask) {
-            mUserActionsListener.activateTask(activatedTask);
+            mPresenter.activateTask(activatedTask);
         }
     };
 
@@ -96,14 +96,14 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         super.onResume();
         // To minimize number of calls, only force an update if this is the first load. Don't
         // force update if coming from another screen.
-        mUserActionsListener.loadTasks(mFirstLoad);
+        mPresenter.loadTasks(mFirstLoad);
         mFirstLoad = false;
     }
 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mUserActionsListener.result(requestCode, resultCode);
+        mPresenter.result(requestCode, resultCode);
     }
 
     @Nullable
@@ -126,7 +126,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         mNoTaskAddView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mUserActionsListener.addNewTask();
+                mPresenter.addNewTask();
             }
         });
 
@@ -137,7 +137,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mUserActionsListener.addNewTask();
+                mPresenter.addNewTask();
             }
         });
 
@@ -150,7 +150,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mUserActionsListener.loadTasks(false);
+                mPresenter.loadTasks(false);
             }
         });
 
@@ -163,7 +163,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_clear:
-                mUserActionsListener.clearCompletedTasks();
+                mPresenter.clearCompletedTasks();
                 return true;
             case R.id.menu_filter:
                 showFilteringPopUpMenu(getActivity().findViewById(R.id.menu_filter));
@@ -186,16 +186,16 @@ public class TasksFragment extends Fragment implements TasksContract.View {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.all:
-                        mUserActionsListener.setFiltering(ALL_TASKS);
+                        mPresenter.setFiltering(ALL_TASKS);
                         break;
                     case R.id.active:
-                        mUserActionsListener.setFiltering(ACTIVE_TASKS);
+                        mPresenter.setFiltering(ACTIVE_TASKS);
                         break;
                     case R.id.completed:
-                        mUserActionsListener.setFiltering(COMPLETED_TASKS);
+                        mPresenter.setFiltering(COMPLETED_TASKS);
                         break;
                 }
-                mUserActionsListener.loadTasks(false);
+                mPresenter.loadTasks(false);
                 return true;
             }
         });
@@ -327,7 +327,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     @Override
     public void setPresenter(@NonNull TasksContract.UserActionListener presenter) {
-        mUserActionsListener = checkNotNull(presenter);
+        mPresenter = checkNotNull(presenter);
     }
 
     public interface TaskItemListener {

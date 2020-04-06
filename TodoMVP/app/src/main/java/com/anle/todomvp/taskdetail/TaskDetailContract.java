@@ -6,7 +6,7 @@ import com.anle.todomvp.BaseView;
 
 public interface TaskDetailContract {
 
-    interface View extends BaseView<UserActionsListener> {
+    interface View extends BaseView<Presenter> {
 
         void setProgressIndicator(boolean active);
 
@@ -33,7 +33,7 @@ public interface TaskDetailContract {
         boolean isInactive();
     }
 
-    interface UserActionsListener {
+    interface Presenter {
 
         void openTask(@Nullable String taskId);
 

@@ -4,7 +4,7 @@ import com.anle.todomvp.BaseView;
 
 public interface AddEditTaskContract {
 
-    interface View extends BaseView<UserActionsListener> {
+    interface View extends BaseView<Presenter> {
 
         void showTasksList();
 
@@ -15,7 +15,7 @@ public interface AddEditTaskContract {
         void setContent(String content);
     }
 
-    interface UserActionsListener {
+    interface Presenter {
 
         void saveTask(String title, String content);
 

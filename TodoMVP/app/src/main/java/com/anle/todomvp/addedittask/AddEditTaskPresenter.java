@@ -7,7 +7,7 @@ import com.anle.todomvp.data.source.TasksDataSource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class AddEditTaskPresenter implements AddEditTaskContract.UserActionsListener,
+public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
         TasksDataSource.GetTaskCallback {
 
     private TasksDataSource mTasksRepository;
@@ -26,8 +26,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.UserActionsList
     }
 
     @Override
-    public void saveTask(String title, String content)
-    {
+    public void saveTask(String title, String content) {
         if (isNewTask()) {
             createTask(title, content);
         } else {
@@ -42,7 +41,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.UserActionsList
         }
     }
 
-    private boolean isNewTask(){
+    private boolean isNewTask() {
         return mTaskId == null;
     }
 

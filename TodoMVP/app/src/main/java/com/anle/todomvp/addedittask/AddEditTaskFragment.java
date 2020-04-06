@@ -10,7 +10,6 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.anle.todomvp.Injection;
 import com.anle.todomvp.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -21,7 +20,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     public static final String ARGUMENT_EDIT_TASK_ID = "ARGUMENT_EDIT_TASK_ID";
 
-    private AddEditTaskContract.UserActionsListener mUserActionListener;
+    private AddEditTaskContract.Presenter mUserActionListener;
 
     private TextView mTitle;
 
@@ -70,7 +69,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     }
 
     @Override
-    public void setPresenter(AddEditTaskContract.UserActionsListener presenter) {
+    public void setPresenter(AddEditTaskContract.Presenter presenter) {
         mUserActionListener = checkNotNull(presenter);
     }
 

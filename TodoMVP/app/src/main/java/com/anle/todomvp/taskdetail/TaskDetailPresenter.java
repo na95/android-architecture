@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 import com.anle.todomvp.data.Task;
 import com.anle.todomvp.data.source.TasksDataSource;
 
-public class TaskDetailPresenter implements TaskDetailContract.UserActionsListener {
+public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
     private TasksDataSource mTasksRepository;
 

@@ -10,23 +10,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.anle.todomvp.data.Task;
 
-@Database(entities = {Task.class}, version = 2 )
+@Database(entities = {Task.class}, version = 2)
 public abstract class TasksDatabase extends RoomDatabase {
-
-    private static final Object sLock = new Object();
-    private static TasksDatabase INSTANCE;
-
-    public static TasksDatabase getInstance(Context context) {
-        synchronized (sLock) {
-            if (INSTANCE == null) {
-                INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                        TasksDatabase.class, "Tasks.db")
-                        .addMigrations(MIGRATION_1_2)
-                        .build();
-            }
-            return INSTANCE;
-        }
-    }
 
     static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
@@ -51,6 +36,20 @@ public abstract class TasksDatabase extends RoomDatabase {
             database.execSQL("ALTER TABLE tasks_new RENAME TO tasks");
         }
     };
+    private static final Object sLock = new Object();
+    private static TasksDatabase INSTANCE;
+
+    public static TasksDatabase getInstance(Context context) {
+        synchronized (sLock) {
+            if (INSTANCE == null) {
+                INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
+                        TasksDatabase.class, "Tasks.db")
+                        .addMigrations(MIGRATION_1_2)
+                        .build();
+            }
+            return INSTANCE;
+        }
+    }
 
     public abstract TasksDao taskDao();
 }

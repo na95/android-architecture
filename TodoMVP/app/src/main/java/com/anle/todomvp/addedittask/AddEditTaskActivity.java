@@ -15,7 +15,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
 
     public static final int REQUEST_ADD_TASK = 1;
 
-    private AddEditTaskContract.UserActionsListener mAddEditTaskPresenter;
+    private AddEditTaskContract.Presenter mAddEditTaskPresenter;
 
     private ActionBar mActionBar;
 
@@ -52,12 +52,13 @@ public class AddEditTaskActivity extends AppCompatActivity {
     }
 
     private void setToolbarTitle(@Nullable String taskId) {
-        if(taskId == null) {
+        if (taskId == null) {
             mActionBar.setTitle(R.string.add_task);
         } else {
             mActionBar.setTitle(R.string.edit_task);
         }
     }
+
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
