@@ -8,6 +8,9 @@ import com.anle.todomvp.data.FakeTasksRemoteDataSource;
 import com.anle.todomvp.data.source.TasksDataSource;
 import com.anle.todomvp.data.source.TasksRepository;
 import com.anle.todomvp.data.source.local.TasksLocalDataSource;
+import com.anle.todomvp.util.schedulers.BaseSchedulerProvider;
+import com.anle.todomvp.util.schedulers.SchedulerProvider;
+import com.google.common.base.Preconditions;
 
 import static androidx.core.util.Preconditions.checkNotNull;
 
@@ -19,8 +22,12 @@ import static androidx.core.util.Preconditions.checkNotNull;
 public class Injection {
 
     public static TasksRepository provideTasksRepository(@NonNull Context context) {
-        checkNotNull(context);
+        Preconditions.checkNotNull(context);
         return TasksRepository.getInstance(FakeTasksRemoteDataSource.getInstance(),
-                TasksLocalDataSource.getInstance(context));
+                TasksLocalDataSource.getInstance(context, provideSchedulerProvider()));
+    }
+
+    public static BaseSchedulerProvider provideSchedulerProvider() {
+        return SchedulerProvider.getInstance();
     }
 }
