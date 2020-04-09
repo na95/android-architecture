@@ -1,6 +1,7 @@
 package com.anle.todomvp.statistics;
 
 
+import com.anle.todomvp.BasePresenter;
 import com.anle.todomvp.BaseView;
 
 public interface StatisticsContract {
@@ -13,11 +14,10 @@ public interface StatisticsContract {
 
         void showLoadingStatisticsError();
 
-        boolean isInactive();
+        boolean isActive();
     }
 
-    interface Presenter {
+    interface Presenter extends BasePresenter {
 
-        void loadStatistics();
     }
 }

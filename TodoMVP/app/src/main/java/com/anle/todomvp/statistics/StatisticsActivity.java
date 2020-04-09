@@ -20,8 +20,6 @@ public class StatisticsActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
 
-    private StatisticsContract.Presenter mStatisticsPresenter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,9 +53,9 @@ public class StatisticsActivity extends AppCompatActivity {
                     statisticsFragment, R.id.contentFrame);
         }
 
-        mStatisticsPresenter = new StatisticsPresenter(
-                Injection.provideTasksRepository(getApplicationContext()),
-                statisticsFragment);
+        new StatisticsPresenter(
+                Injection.provideTasksRepository(getApplicationContext()), statisticsFragment,
+                Injection.provideSchedulerProvider());
 
     }
 

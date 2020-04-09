@@ -1,12 +1,20 @@
 package com.anle.todomvp.statistics;
 
 import androidx.annotation.NonNull;
+import androidx.core.util.Pair;
 
 import com.anle.todomvp.data.Task;
 import com.anle.todomvp.data.source.TasksDataSource;
 import com.anle.todomvp.data.source.TasksRepository;
+import com.anle.todomvp.util.schedulers.BaseSchedulerProvider;
+import com.google.common.base.Preconditions;
+import com.google.common.primitives.Ints;
 
 import java.util.List;
+
+import io.reactivex.Flowable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 import static androidx.core.util.Preconditions.checkNotNull;
 
@@ -17,56 +25,52 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
 
     private final StatisticsContract.View mStatisticsView;
 
+    @NonNull
+    private final BaseSchedulerProvider mSchedulerProvider;
+
+    @NonNull
+    private CompositeDisposable mCompositeDisposable;
+
     public StatisticsPresenter(@NonNull TasksRepository tasksRepository,
-                               @NonNull StatisticsContract.View statisticsView) {
-        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
-        mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
+                               @NonNull StatisticsContract.View statisticsView,
+                               @NonNull BaseSchedulerProvider schedulerProvider) {
+        mTasksRepository = Preconditions.checkNotNull(tasksRepository, "tasksRepository cannot be null");
+        mStatisticsView = Preconditions.checkNotNull(statisticsView, "statisticsView cannot be null!");
+        mSchedulerProvider = Preconditions.checkNotNull(schedulerProvider, "schedulerProvider cannot be null");
+
+        mCompositeDisposable = new CompositeDisposable();
         mStatisticsView.setPresenter(this);
     }
 
     @Override
-    public void loadStatistics() {
+    public void subscribe() {
+        loadStatistics();
+    }
+
+    @Override
+    public void unsubscribe() {
+        mCompositeDisposable.clear();
+    }
+
+    private void loadStatistics() {
         mStatisticsView.setProgressIndicator(true);
 
-        // The network request might be handled in a different thread so make sure Espresso knows
-        // that the app is busy until the response is handled.
-
-        mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
-            @Override
-            public void onTasksLoaded(List<Task> tasks) {
-                int activeTasks = 0;
-                int completedTasks = 0;
-
-                // This callback may be called twice, once for the cache and once for loading
-                // the data from the server API, so we check before decrementing, otherwise
-                // it throws "Counter has been corrupted!" exception.
-
-                // We calculate number of active and completed tasks
-                for (Task task : tasks) {
-                    if (task.isCompleted()) {
-                        completedTasks += 1;
-                    } else {
-                        activeTasks += 1;
-                    }
-                }
-
-                // The View may not be on screen anymore when this callback is returned
-                if (mStatisticsView.isInactive()) {
-                    return;
-                }
-
-                mStatisticsView.setProgressIndicator(false);
-
-                mStatisticsView.displayStatistics(activeTasks, completedTasks);
-            }
-
-            @Override
-            public void onDataNotAvailable() {
-                if (mStatisticsView.isInactive()) {
-                    return;
-                }
-                mStatisticsView.showLoadingStatisticsError();
-            }
-        });
+        Flowable<Task> tasks = mTasksRepository
+                .getTasks()
+                .flatMap(Flowable::fromIterable);
+        Flowable<Long> completedTasks = tasks.filter(Task::isCompleted).count().toFlowable();
+        Flowable<Long> activeTasks = tasks.filter(Task::isActive).count().toFlowable();
+        Disposable disposable = Flowable
+                .zip(completedTasks, activeTasks, (completed, active) -> Pair.create(active, completed))
+                .subscribeOn(mSchedulerProvider.computation())
+                .observeOn(mSchedulerProvider.ui())
+                .subscribe(
+                        // onNext
+                        stats -> mStatisticsView.displayStatistics(Ints.saturatedCast(stats.first), Ints.saturatedCast(stats.second)),
+                        // onError
+                        throwable -> mStatisticsView.showLoadingStatisticsError(),
+                        // onCompleted
+                        () -> mStatisticsView.setProgressIndicator(false));
+        mCompositeDisposable.add(disposable);
     }
 }

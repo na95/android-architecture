@@ -17,7 +17,7 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
 
     private TextView mStatisticsTV;
 
-    private StatisticsContract.Presenter mActionsListener;
+    private StatisticsContract.Presenter mPresenter;
 
     public static StatisticsFragment newInstance() {
         return new StatisticsFragment();
@@ -35,15 +35,19 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     @Override
     public void onResume() {
         super.onResume();
-        mActionsListener.loadStatistics();
+        mPresenter.subscribe();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mPresenter.unsubscribe();
     }
 
     @Override
     public void setProgressIndicator(boolean active) {
         if (active) {
             mStatisticsTV.setText(getString(R.string.loading));
-        } else {
-            mStatisticsTV.setText("");
         }
     }
 
@@ -65,12 +69,12 @@ public class StatisticsFragment extends Fragment implements StatisticsContract.V
     }
 
     @Override
-    public boolean isInactive() {
-        return !isAdded();
+    public boolean isActive() {
+        return isAdded();
     }
 
     @Override
     public void setPresenter(StatisticsContract.Presenter presenter) {
-        mActionsListener = checkNotNull(presenter);
+        mPresenter = checkNotNull(presenter);
     }
 }
