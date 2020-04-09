@@ -4,12 +4,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.anle.todomvp.data.Task;
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.reactivex.Flowable;
 
 import static androidx.core.util.Preconditions.checkNotNull;
 
@@ -70,79 +73,49 @@ public class TasksRepository implements TasksDataSource {
     }
 
 
+    /**
+     * Gets tasks from cache, local data source (SQLite) or remote data source, whichever is
+     * available first.
+     */
     @Override
-    public void getTasks(@NonNull final LoadTasksCallback callback) {
-        checkNotNull(callback);
-
+    public Flowable<List<Task>> getTasks() {
         // Respond immediately with cache if available and not dirty
         if (mCachedTasks != null && !mCacheIsDirty) {
-            callback.onTasksLoaded(new ArrayList<>(mCachedTasks.values()));
-            return;
+            return Flowable.fromIterable(mCachedTasks.values()).toList().toFlowable();
+        } else if (mCachedTasks == null) {
+            mCachedTasks = new LinkedHashMap<>();
         }
 
+        Flowable<List<Task>> remoteTasks = getAndSaveRemoteTasks();
+
         if (mCacheIsDirty) {
-            // If the cache is dirty we need to fetch new data from the network.
-            getTasksFromRemoteDataSource(callback);
+            return remoteTasks;
         } else {
             // Query the local storage if available. If not, query the network.
-            mTasksLocalDataSource.getTasks(new LoadTasksCallback() {
-                @Override
-                public void onTasksLoaded(List<Task> tasks) {
-                    processLoadedTasks(tasks, callback);
-                }
-
-                @Override
-                public void onDataNotAvailable() {
-                    getTasksFromRemoteDataSource(callback);
-                }
-            });
+            Flowable<List<Task>> localTasks = getAndCacheLocalTasks();
+            return Flowable.concat(localTasks, remoteTasks)
+                    .filter(tasks -> !tasks.isEmpty())
+                    .firstOrError()
+                    .toFlowable();
         }
     }
 
-    /**
-     * Gets tasks from local data source (sqlite) unless the table is new or empty. In that case it
-     * uses the network data source. This is done to simplify the sample.
-     * <p>
-     * Note: {@link LoadTasksCallback#onDataNotAvailable()} is fired if both data sources fail to
-     * get the data.
-     */
-    @Override
-    public void getTask(@NonNull final String taskId, @NonNull final GetTaskCallback callback) {
-        checkNotNull(taskId);
-        checkNotNull(callback);
+    private Flowable<List<Task>> getAndCacheLocalTasks() {
+        return mTasksLocalDataSource.getTasks()
+                .flatMap(tasks -> Flowable.fromIterable(tasks)
+                        .doOnNext(task -> mCachedTasks.put(task.getId(), task))
+                        .toList()
+                        .toFlowable());
+    }
 
-        Task cachedTask = getTaskWithId(taskId);
-
-        // Respond immediately with cache if available
-        if (cachedTask != null) {
-            callback.onTaskLoaded(cachedTask);
-            return;
-        }
-
-        // Load from server/persisted if needed.
-
-        // Is the task in the local data source? If not, query the network.
-        mTasksLocalDataSource.getTask(taskId, new GetTaskCallback() {
-            @Override
-            public void onTaskLoaded(Task task) {
-                callback.onTaskLoaded(task);
-            }
-
-            @Override
-            public void onDataNotAvailable() {
-                mTasksRemoteDataSource.getTask(taskId, new GetTaskCallback() {
-                    @Override
-                    public void onTaskLoaded(Task task) {
-                        callback.onTaskLoaded(task);
-                    }
-
-                    @Override
-                    public void onDataNotAvailable() {
-                        callback.onDataNotAvailable();
-                    }
-                });
-            }
-        });
+    private Flowable<List<Task>> getAndSaveRemoteTasks() {
+        return mTasksRemoteDataSource
+                .getTasks()
+                .flatMap(tasks -> Flowable.fromIterable(tasks).doOnNext(task -> {
+                    mTasksLocalDataSource.saveTask(task);
+                    mCachedTasks.put(task.getId(), task);
+                }).toList().toFlowable())
+                .doOnComplete(() -> mCacheIsDirty = false);
     }
 
     @Override
@@ -242,30 +215,55 @@ public class TasksRepository implements TasksDataSource {
         mCachedTasks.remove(taskId);
     }
 
-    private void getTasksFromRemoteDataSource(@NonNull final LoadTasksCallback callback) {
-        mTasksRemoteDataSource.getTasks(new LoadTasksCallback() {
-            @Override
-            public void onTasksLoaded(List<Task> tasks) {
-                processLoadedTasks(tasks, callback);
-            }
+    /**
+     * Gets tasks from local data source (sqlite) unless the table is new or empty. In that case it
+     * uses the network data source. This is done to simplify the sample.
+     */
+    @Override
+    public Flowable<Optional<Task>> getTask(@NonNull final String taskId) {
+        Preconditions.checkNotNull(taskId);
 
-            @Override
-            public void onDataNotAvailable() {
-                callback.onDataNotAvailable();
-            }
-        });
-    }
+        final Task cachedTask = getTaskWithId(taskId);
 
-    private void processLoadedTasks(List<Task> tasks, final LoadTasksCallback callback) {
+        // Respond immediately with cache if available
+        if (cachedTask != null) {
+            return Flowable.just(Optional.of(cachedTask));
+        }
+
+        // Load from server/persisted if needed.
+
+        // Do in memory cache update to keep the app UI up to date
         if (mCachedTasks == null) {
             mCachedTasks = new LinkedHashMap<>();
         }
-        mCachedTasks.clear();
-        for (Task task : tasks) {
-            mCachedTasks.put(task.getId(), task);
-        }
-        callback.onTasksLoaded(new ArrayList<>(mCachedTasks.values()));
-        mCacheIsDirty = false;
+
+        // Is the task in the local data source? If not, query the network.
+        Flowable<Optional<Task>> localTask = getTaskWithIdFromLocalRepository(taskId);
+        Flowable<Optional<Task>> remoteTask = mTasksRemoteDataSource
+                .getTask(taskId)
+                .doOnNext(taskOptional -> {
+                    if (taskOptional.isPresent()) {
+                        Task task = taskOptional.get();
+                        mTasksLocalDataSource.saveTask(task);
+                        mCachedTasks.put(task.getId(), task);
+                    }
+                });
+
+        return Flowable.concat(localTask, remoteTask)
+                .firstElement()
+                .toFlowable();
+    }
+
+    @NonNull
+    Flowable<Optional<Task>> getTaskWithIdFromLocalRepository(@NonNull final String taskId) {
+        return mTasksLocalDataSource
+                .getTask(taskId)
+                .doOnNext(taskOptional -> {
+                    if (taskOptional.isPresent()) {
+                        mCachedTasks.put(taskId, taskOptional.get());
+                    }
+                })
+                .firstElement().toFlowable();
     }
 
     @Nullable

@@ -3,8 +3,11 @@ package com.anle.todomvp.data.source;
 import androidx.annotation.NonNull;
 
 import com.anle.todomvp.data.Task;
+import com.google.common.base.Optional;
 
 import java.util.List;
+
+import io.reactivex.Flowable;
 
 /**
  * Main entry point for accessing tasks data.
@@ -16,9 +19,9 @@ import java.util.List;
  */
 public interface TasksDataSource {
 
-    void getTasks(@NonNull LoadTasksCallback callback);
+    Flowable<List<Task>> getTasks();
 
-    void getTask(@NonNull String taskId, @NonNull GetTaskCallback callback);
+    Flowable<Optional<Task>> getTask(@NonNull String taskId);
 
     void saveTask(@NonNull Task task);
 
@@ -38,17 +41,4 @@ public interface TasksDataSource {
 
     void deleteTask(@NonNull String taskId);
 
-    interface LoadTasksCallback {
-
-        void onTasksLoaded(List<Task> tasks);
-
-        void onDataNotAvailable();
-    }
-
-    interface GetTaskCallback {
-
-        void onTaskLoaded(Task task);
-
-        void onDataNotAvailable();
-    }
 }
