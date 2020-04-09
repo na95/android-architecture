@@ -1,5 +1,6 @@
 package com.anle.todomvp.tasks;
 
+import com.anle.todomvp.BasePresenter;
 import com.anle.todomvp.BaseView;
 import com.anle.todomvp.data.Task;
 
@@ -7,9 +8,9 @@ import java.util.List;
 
 public interface TasksContract {
 
-    interface View extends BaseView<UserActionListener> {
+    interface View extends BaseView<Presenter> {
 
-        void setProgressIndicator(boolean active);
+        void setLoadingIndicator(boolean active);
 
         void showTasks(List<Task> taskList);
 
@@ -43,7 +44,7 @@ public interface TasksContract {
 
     }
 
-    interface UserActionListener {
+    interface Presenter extends BasePresenter {
 
         void result(int requestCode, int resultCode);
 
@@ -56,10 +57,6 @@ public interface TasksContract {
         void completeTask(Task task);
 
         void activateTask(Task task);
-
-        void loadActiveTasks(boolean forceUpdate);
-
-        void loadCompletedTasks(boolean forceUpdate);
 
         void clearCompletedTasks();
 

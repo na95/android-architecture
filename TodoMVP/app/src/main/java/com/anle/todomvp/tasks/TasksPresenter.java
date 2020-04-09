@@ -8,105 +8,109 @@ import com.anle.todomvp.addedittask.AddEditTaskActivity;
 import com.anle.todomvp.data.Task;
 import com.anle.todomvp.data.source.TasksDataSource;
 import com.anle.todomvp.data.source.TasksRepository;
+import com.anle.todomvp.util.schedulers.BaseSchedulerProvider;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.Flowable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class TasksPresenter implements TasksContract.UserActionListener {
+public class TasksPresenter implements TasksContract.Presenter {
 
     private final TasksRepository mTasksRepository;
 
     private final TasksContract.View mTasksView;
 
     @NonNull
+    private final BaseSchedulerProvider mSchedulerProvider;
+
+    @NonNull
     private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
-    public TasksPresenter(@NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView) {
+    private boolean mFirstLoad = true;
+
+    @NonNull
+    private CompositeDisposable mCompositeDisposable;
+
+    public TasksPresenter(@NonNull TasksRepository tasksRepository,
+                          @NonNull TasksContract.View tasksView,
+                          @NonNull BaseSchedulerProvider schedulerProvider) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
+        mSchedulerProvider = checkNotNull(schedulerProvider, "schedulerProvider cannot be null");
+
+        mCompositeDisposable = new CompositeDisposable();
         mTasksView.setPresenter(this);
     }
 
     @Override
+    public void subscribe() {
+        loadTasks(false);
+    }
+
+    @Override
+    public void unsubscribe() {
+        mCompositeDisposable.clear();
+    }
+
+    @Override
+    public void result(int requestCode, int resultCode) {
+        // If a task was successfully added, show snackbar
+        if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode && Activity.RESULT_OK == resultCode) {
+            mTasksView.showSuccessfullySavedMessage();
+        }
+    }
+
+    @Override
     public void loadTasks(boolean forceUpdate) {
-        loadTasks(forceUpdate, true);
-    }
-
-    @Override
-    public void loadActiveTasks(boolean forceUpdate) {
-        loadTasks(forceUpdate, true);
-    }
-
-    @Override
-    public void loadCompletedTasks(boolean forceUpdate) {
-        loadTasks(forceUpdate, true);
+        // Simplification for sample: a network reload will be forced on first load.
+        loadTasks(forceUpdate || mFirstLoad, true);
+        mFirstLoad = false;
     }
 
     /**
      * @param forceUpdate   Pass in true to refresh the data in the {@link TasksDataSource}
      * @param showLoadingUI Pass in true to display a loading icon in the UI
      */
-    private void loadTasks(boolean forceUpdate, final boolean showLoadingUI) {
-
+    private void loadTasks(final boolean forceUpdate, final boolean showLoadingUI) {
         if (showLoadingUI) {
-            mTasksView.setProgressIndicator(true);
+            mTasksView.setLoadingIndicator(true);
         }
-
         if (forceUpdate) {
             mTasksRepository.refreshTasks();
         }
 
-        mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
-            @Override
-            public void onTasksLoaded(List<Task> tasks) {
-                List<Task> tasksToShow = new ArrayList<Task>();
-
-                // We filter the tasks based on the requestType
-                for (Task task : tasks) {
+        mCompositeDisposable.clear();
+        Disposable disposable = mTasksRepository
+                .getTasks()
+                .flatMap(Flowable::fromIterable)
+                .filter(task -> {
                     switch (mCurrentFiltering) {
-                        case ALL_TASKS:
-                            tasksToShow.add(task);
-                            break;
                         case ACTIVE_TASKS:
-                            if (task.isActive()) {
-                                tasksToShow.add(task);
-                            }
-                            break;
+                            return task.isActive();
                         case COMPLETED_TASKS:
-                            if (task.isCompleted()) {
-                                tasksToShow.add(task);
-                            }
-                            break;
+                            return task.isCompleted();
+                        case ALL_TASKS:
                         default:
-                            tasksToShow.add(task);
-                            break;
+                            return true;
                     }
-                }
+                })
+                .toList()
+                .subscribeOn(mSchedulerProvider.io())
+                .observeOn(mSchedulerProvider.ui())
+                .subscribe(
+                        // onNext
+                        tasks -> {
+                            processTasks(tasks);
+                            mTasksView.setLoadingIndicator(false);
+                        },
+                        // onError
+                        throwable -> mTasksView.showLoadingTasksError());
 
-                // The View may not be on screen anymore when this callback is returned
-                if (mTasksView.isActive()) {
-                    return;
-                }
-
-                if (showLoadingUI) {
-                    mTasksView.setProgressIndicator(false);
-                }
-
-                processTasks(tasksToShow);
-            }
-
-            @Override
-            public void onDataNotAvailable() {
-                // The View may not be on screen anymore when this callback is returned
-                if (mTasksView.isActive()) {
-                    return;
-                }
-
-                mTasksView.showLoadingTasksError();
-            }
-        });
+        mCompositeDisposable.add(disposable);
     }
 
     @Override
@@ -191,14 +195,6 @@ public class TasksPresenter implements TasksContract.UserActionListener {
             default:
                 mTasksView.showNoTasks();
                 break;
-        }
-    }
-
-    @Override
-    public void result(int requestCode, int resultCode) {
-        // If a task was successfully added, show snackbar
-        if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode && Activity.RESULT_OK == resultCode) {
-            mTasksView.showSuccessfullySavedMessage();
         }
     }
 }

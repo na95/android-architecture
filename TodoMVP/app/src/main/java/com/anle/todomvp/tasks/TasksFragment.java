@@ -56,9 +56,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     private ImageView mNoTaskIcon;
 
-    private boolean mFirstLoad = true;
-
-    private TasksContract.UserActionListener mPresenter;
+    private TasksContract.Presenter mPresenter;
 
     private TaskItemListener mItemListener = new TaskItemListener() {
         @Override
@@ -94,12 +92,14 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        // To minimize number of calls, only force an update if this is the first load. Don't
-        // force update if coming from another screen.
-        mPresenter.loadTasks(mFirstLoad);
-        mFirstLoad = false;
+        mPresenter.subscribe();
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        mPresenter.unsubscribe();
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -268,7 +268,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     }
 
     @Override
-    public void setProgressIndicator(final boolean active) {
+    public void setLoadingIndicator(final boolean active) {
         if (getView() == null) {
             return;
         }
@@ -298,7 +298,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
 
     @Override
     public boolean isActive() {
-        return !isAdded();
+        return isAdded();
     }
 
     @Override
@@ -326,7 +326,7 @@ public class TasksFragment extends Fragment implements TasksContract.View {
     }
 
     @Override
-    public void setPresenter(@NonNull TasksContract.UserActionListener presenter) {
+    public void setPresenter(@NonNull TasksContract.Presenter presenter) {
         mPresenter = checkNotNull(presenter);
     }
 
