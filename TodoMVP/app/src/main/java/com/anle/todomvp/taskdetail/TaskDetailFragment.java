@@ -21,6 +21,7 @@ import com.anle.todomvp.addedittask.AddEditTaskActivity;
 import com.anle.todomvp.addedittask.AddEditTaskFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.common.base.Preconditions;
 
 import static androidx.core.util.Preconditions.checkNotNull;
 
@@ -62,7 +63,13 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     @Override
     public void onResume() {
         super.onResume();
-        openTask();
+        mPresenter.subscribe();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mPresenter.unsubscribe();
     }
 
     @Nullable
@@ -83,7 +90,7 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
             @Override
             public void onClick(View v) {
                 String taskId = getArguments().getString(AGRUMENT_TASK_ID);
-                mPresenter.editTask(taskId);
+                mPresenter.editTask();
             }
         });
 
@@ -101,20 +108,14 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
         switch (item.getItemId()) {
             case R.id.menu_delete:
                 String taskId = getArguments().getString(AGRUMENT_TASK_ID);
-                mPresenter.deleteTask(taskId);
+                mPresenter.deleteTask();
                 return true;
         }
         return false;
     }
 
-
-    private void openTask() {
-        String taskId = getArguments().getString(AGRUMENT_TASK_ID);
-        mPresenter.openTask(taskId);
-    }
-
     @Override
-    public void setProgressIndicator(boolean active) {
+    public void setLoadingIndicator(boolean active) {
         if (active) {
             mTaskDetailTitle.setText("");
             mTaskDetailContent.setText(getString(R.string.loading));
@@ -151,17 +152,17 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
 
     @Override
     public void showCompletionStatus(final boolean complete) {
+        Preconditions.checkNotNull(mTaskDetailCompleteStatus);
+
         mTaskDetailCompleteStatus.setChecked(complete);
-        mTaskDetailCompleteStatus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (complete) {
-                    mPresenter.activateTask(getArguments().getString(AGRUMENT_TASK_ID));
-                } else {
-                    mPresenter.completeTask(getArguments().getString(AGRUMENT_TASK_ID));
-                }
-            }
-        });
+        mTaskDetailCompleteStatus.setOnCheckedChangeListener(
+                (buttonView, isChecked) -> {
+                    if (isChecked) {
+                        mPresenter.completeTask();
+                    } else {
+                        mPresenter.activateTask();
+                    }
+                });
     }
 
     @Override
@@ -180,19 +181,17 @@ public class TaskDetailFragment extends Fragment implements TaskDetailContract.V
     public void showTaskMarkedComplete() {
         Snackbar.make(getView(), getString(R.string.task_marked_complete), Snackbar.LENGTH_LONG)
                 .show();
-        openTask();
     }
 
     @Override
     public void showTaskMarkedActive() {
         Snackbar.make(getView(), getString(R.string.task_marked_active), Snackbar.LENGTH_LONG)
                 .show();
-        openTask();
     }
 
     @Override
-    public boolean isInactive() {
-        return !isAdded();
+    public boolean isActive() {
+        return isAdded();
     }
 
     @Override

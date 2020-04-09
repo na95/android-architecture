@@ -40,7 +40,12 @@ public class TaskDetailActivity extends AppCompatActivity {
                     getSupportFragmentManager(), taskDetailFragment, R.id.contentFrame);
         }
 
-        mTaskDetailPresenter = new TaskDetailPresenter(Injection.provideTasksRepository(getApplicationContext()), taskDetailFragment);
+        // Create the presenter
+        new TaskDetailPresenter(
+                taskId,
+                Injection.provideTasksRepository(getApplicationContext()),
+                taskDetailFragment,
+                Injection.provideSchedulerProvider());
     }
 
     @Override

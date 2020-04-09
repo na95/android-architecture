@@ -1,9 +1,18 @@
 package com.anle.todomvp.taskdetail;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.anle.todomvp.data.Task;
 import com.anle.todomvp.data.source.TasksDataSource;
+import com.anle.todomvp.data.source.TasksRepository;
+import com.anle.todomvp.util.schedulers.BaseSchedulerProvider;
+import com.google.common.base.Optional;
+import com.google.common.base.Strings;
+
+import io.reactivex.disposables.CompositeDisposable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
@@ -11,93 +20,111 @@ public class TaskDetailPresenter implements TaskDetailContract.Presenter {
 
     private TaskDetailContract.View mTaskDetailView;
 
-    public TaskDetailPresenter(@NonNull TasksDataSource taskRepository, @NonNull TaskDetailContract.View taskDetailView) {
-        mTasksRepository = taskRepository;
-        mTaskDetailView = taskDetailView;
+    @NonNull
+    private final BaseSchedulerProvider mSchedulerProvider;
+
+    @Nullable
+    private String mTaskId;
+
+    @NonNull
+    private CompositeDisposable mCompositeDisposable;
+
+    public TaskDetailPresenter(@Nullable String taskId,
+                               @NonNull TasksRepository tasksRepository,
+                               @NonNull TaskDetailContract.View taskDetailView,
+                               @NonNull BaseSchedulerProvider schedulerProvider) {
+        this.mTaskId = taskId;
+        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
+        mTaskDetailView = checkNotNull(taskDetailView, "taskDetailView cannot be null!");
+        mSchedulerProvider = checkNotNull(schedulerProvider, "schedulerProvider cannot be null");
+
+        mCompositeDisposable = new CompositeDisposable();
         mTaskDetailView.setPresenter(this);
     }
 
     @Override
-    public void openTask(String taskId) {
-        if (null == taskId || taskId.isEmpty()) {
+    public void subscribe() {
+        openTask();
+    }
+
+    @Override
+    public void unsubscribe() {
+        mCompositeDisposable.clear();
+    }
+
+    private void openTask() {
+        if (Strings.isNullOrEmpty(mTaskId)) {
             mTaskDetailView.showMissingTask();
             return;
         }
 
-        mTaskDetailView.setProgressIndicator(true);
-        mTasksRepository.getTask(taskId, new TasksDataSource.GetTaskCallback() {
-            @Override
-            public void onTaskLoaded(Task task) {
-                // The View may not be on screen anymore when this callback is returned
-                if (mTaskDetailView.isInactive()) {
-                    return;
-                }
-                mTaskDetailView.setProgressIndicator(false);
-                if (null == task) {
-                    mTaskDetailView.showMissingTask();
-                } else {
-                    showTask(task);
-                }
-            }
-
-            @Override
-            public void onDataNotAvailable() {
-                // The View may not be on screen anymore when this callback is returned
-                if (mTaskDetailView.isInactive()) {
-                    return;
-                }
-                mTaskDetailView.showMissingTask();
-            }
-        });
-
+        mTaskDetailView.setLoadingIndicator(true);
+        mCompositeDisposable.add(mTasksRepository
+                .getTask(mTaskId)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .subscribeOn(mSchedulerProvider.computation())
+                .observeOn(mSchedulerProvider.ui())
+                .subscribe(
+                        // onNext
+                        this::showTask,
+                        // onError
+                        throwable -> {
+                        },
+                        // onCompleted
+                        () -> mTaskDetailView.setLoadingIndicator(false)));
     }
 
     @Override
-    public void deleteTask(String taskId) {
-        mTasksRepository.deleteTask(taskId);
+    public void editTask() {
+        if (Strings.isNullOrEmpty(mTaskId)) {
+            mTaskDetailView.showMissingTask();
+            return;
+        }
+        mTaskDetailView.showEditTaskUI(mTaskId);
+    }
+
+    @Override
+    public void deleteTask() {
+        if (Strings.isNullOrEmpty(mTaskId)) {
+            mTaskDetailView.showMissingTask();
+            return;
+        }
+        mTasksRepository.deleteTask(mTaskId);
         mTaskDetailView.showTaskDeleted();
     }
 
     @Override
-    public void completeTask(String taskId) {
-        if (null == taskId || taskId.isEmpty()) {
+    public void completeTask() {
+        if (Strings.isNullOrEmpty(mTaskId)) {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksRepository.completeTask(taskId);
+        mTasksRepository.completeTask(mTaskId);
         mTaskDetailView.showTaskMarkedComplete();
     }
 
     @Override
-    public void activateTask(String taskId) {
-        if (null == taskId || taskId.isEmpty()) {
+    public void activateTask() {
+        if (Strings.isNullOrEmpty(mTaskId)) {
             mTaskDetailView.showMissingTask();
             return;
         }
-        mTasksRepository.activateTask(taskId);
+        mTasksRepository.activateTask(mTaskId);
         mTaskDetailView.showTaskMarkedActive();
     }
 
-    @Override
-    public void editTask(String taskId) {
-        if (null == taskId || taskId.isEmpty()) {
-            mTaskDetailView.showMissingTask();
-            return;
-        }
-        mTaskDetailView.showEditTaskUI(taskId);
-    }
-
-    private void showTask(Task task) {
+    private void showTask(@NonNull Task task) {
         String title = task.getTitle();
         String description = task.getContent();
 
-        if (title != null && title.isEmpty()) {
+        if (Strings.isNullOrEmpty(title)) {
             mTaskDetailView.hideTitle();
         } else {
             mTaskDetailView.showTitle(title);
         }
 
-        if (description != null && description.isEmpty()) {
+        if (Strings.isNullOrEmpty(description)) {
             mTaskDetailView.hideContent();
         } else {
             mTaskDetailView.showContent(description);

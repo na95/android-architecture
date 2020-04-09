@@ -2,13 +2,14 @@ package com.anle.todomvp.taskdetail;
 
 import androidx.annotation.Nullable;
 
+import com.anle.todomvp.BasePresenter;
 import com.anle.todomvp.BaseView;
 
 public interface TaskDetailContract {
 
     interface View extends BaseView<Presenter> {
 
-        void setProgressIndicator(boolean active);
+        void setLoadingIndicator(boolean active);
 
         void showMissingTask();
 
@@ -30,19 +31,17 @@ public interface TaskDetailContract {
 
         void showTaskMarkedActive();
 
-        boolean isInactive();
+        boolean isActive();
     }
 
-    interface Presenter {
+    interface Presenter extends BasePresenter {
 
-        void openTask(@Nullable String taskId);
+        void editTask();
 
-        void deleteTask(@Nullable String taskId);
+        void deleteTask();
 
-        void completeTask(@Nullable String taskId);
+        void completeTask();
 
-        void activateTask(@Nullable String taskId);
-
-        void editTask(@Nullable String taskId);
+        void activateTask();
     }
 }
