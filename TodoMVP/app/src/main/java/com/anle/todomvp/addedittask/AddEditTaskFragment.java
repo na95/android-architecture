@@ -20,14 +20,11 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     public static final String ARGUMENT_EDIT_TASK_ID = "ARGUMENT_EDIT_TASK_ID";
 
-    private AddEditTaskContract.Presenter mUserActionListener;
+    private AddEditTaskContract.Presenter mPresenter;
 
     private TextView mTitle;
 
     private TextView mContent;
-
-    public AddEditTaskFragment() {
-    }
 
     public static AddEditTaskFragment newInstance() {
         return new AddEditTaskFragment();
@@ -36,7 +33,13 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
     @Override
     public void onResume() {
         super.onResume();
-        mUserActionListener.populateTask();
+        mPresenter.subscribe();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mPresenter.unsubscribe();
     }
 
     @Nullable
@@ -49,7 +52,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
         FloatingActionButton fab = getActivity().findViewById(R.id.fab_edit_task_done);
         fab.setImageResource(R.drawable.ic_done);
-        fab.setOnClickListener(__ -> mUserActionListener.saveTask(mTitle.getText().toString(),
+        fab.setOnClickListener(__ -> mPresenter.saveTask(mTitle.getText().toString(),
                 mContent.getText().toString()));
 
         setHasOptionsMenu(true);
@@ -70,7 +73,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 
     @Override
     public void setPresenter(AddEditTaskContract.Presenter presenter) {
-        mUserActionListener = checkNotNull(presenter);
+        mPresenter = checkNotNull(presenter);
     }
 
     @Override
@@ -83,5 +86,8 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
         mContent.setText(description);
     }
 
-
+    @Override
+    public boolean isActive() {
+        return isAdded();
+    }
 }
