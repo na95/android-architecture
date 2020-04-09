@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
     defaultConfig {
         applicationId "com.anle.todomvp"
-        minSdkVersion 21
-        targetSdkVersion 29
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -49,13 +49,19 @@ android {
         implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
         implementation 'com.google.android.material:material:1.1.0'
         implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+        implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-beta01'
         implementation "com.google.guava:guava:$rootProject.guavaVersion"
         implementation "android.arch.persistence.room:runtime:$rootProject.roomVersion"
+        implementation "io.reactivex.rxjava2:rxjava:$rootProject.rxjavaVersion"
+        implementation "io.reactivex.rxjava2:rxandroid:$rootProject.rxandroidVersion"
+        implementation "com.squareup.sqlbrite2:sqlbrite:$rootProject.sqlbriteVersion"
+
         annotationProcessor "android.arch.persistence.room:compiler:$rootProject.roomVersion"
-        androidTestImplementation "android.arch.persistence.room:testing:$rootProject.roomVersion"
-        testImplementation "junit:junit:$rootProject.junitVersion"
+
         androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-        androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-        implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-beta01'
+        androidTestImplementation "androidx.test.espresso:espresso-core:$rootProject.espressoVersion"
+        androidTestImplementation "android.arch.persistence.room:testing:$rootProject.roomVersion"
+
+        testImplementation "junit:junit:$rootProject.junitVersion"
     }
 }
