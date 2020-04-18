@@ -9,6 +9,7 @@ import com.anle.todomvp.data.source.TasksDataSource;
 import com.anle.todomvp.data.source.TasksRepository;
 import com.anle.todomvp.data.source.local.TasksDatabase;
 import com.anle.todomvp.data.source.local.TasksLocalDataSource;
+import com.anle.todomvp.data.source.remote.TasksRemoteDataSource;
 import com.anle.todomvp.util.AppExecutors;
 
 import static androidx.core.util.Preconditions.checkNotNull;
@@ -23,7 +24,7 @@ public class Injection {
     public static TasksRepository provideTasksRepository(@NonNull Context context) {
         checkNotNull(context);
         TasksDatabase database = TasksDatabase.getInstance(context);
-        return TasksRepository.getInstance(FakeTasksRemoteDataSource.getInstance(),
+        return TasksRepository.getInstance(TasksRemoteDataSource.getInstance(),
                 TasksLocalDataSource.getInstance(new AppExecutors(), database.taskDao()));
     }
 }
