@@ -1,3 +1,5 @@
 # todo-mvp
 
-To learn how to implement mvp based on https://github.com/android/architecture-samples
+An updating part of [mvp-todo branch](https://github.com/na95/android-architecture/tree/mvp-todo).
+
+Implementing reactive (RxJava, RxAndroid) on getting database.
