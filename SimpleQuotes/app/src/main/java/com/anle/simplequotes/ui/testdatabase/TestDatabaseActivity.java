@@ -41,4 +41,9 @@ public class TestDatabaseActivity extends AppCompatActivity implements Lifecycle
             }
         });
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }

@@ -12,7 +12,7 @@ public class Quote {
     @NonNull
     @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "id")
-    private String id;
+    private int id;
 
     @NonNull
     @ColumnInfo(name = "content")
@@ -31,7 +31,7 @@ public class Quote {
     }
 
     // @Ignore
-    public Quote(@Nullable String id, @NonNull String content, @Nullable String author, @Nullable String topic) {
+    public Quote(@Nullable int id, @NonNull String content, @Nullable String author, @Nullable String topic) {
         this.id = id;
         this.content = content;
         this.author = author;
@@ -39,15 +39,16 @@ public class Quote {
     }
 
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
     public String getContent() {
+        content = content.replace(".",".\n");
         return content;
     }
 

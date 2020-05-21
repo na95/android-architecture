@@ -23,5 +23,8 @@ public interface QuotesDAO {
     LiveData<List<Quote>> getQuotesList();
 
     @Query("SELECT * FROM Quote WHERE id=:quoteId")
-    LiveData<Quote> getQuote(String quoteId);
+    LiveData<Quote> getQuote(int quoteId);
+
+    @Query("SELECT COUNT(*) FROM Quote")
+    int getTotalQuotes();
 }

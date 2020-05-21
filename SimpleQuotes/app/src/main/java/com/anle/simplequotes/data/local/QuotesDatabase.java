@@ -9,6 +9,12 @@ import androidx.room.RoomDatabase;
 
 import com.anle.simplequotes.data.model.Quote;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+
 
 /**
  * The Room Database that contains the Quote table.
@@ -22,12 +28,13 @@ public abstract class QuotesDatabase extends RoomDatabase {
     public static QuotesDatabase INSTANCE;
 
     public static synchronized QuotesDatabase getInstance(Context context) {
+
         if (INSTANCE == null) {
             INSTANCE = Room.databaseBuilder(
                     context,
                     QuotesDatabase.class,
                     DB_NAME)
-                    .createFromAsset("/databases/" + DB_NAME)
+                    .createFromAsset("databases/" + DB_NAME)
                     .build();
         }
 

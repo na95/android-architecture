@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="quoteContent">20dp</dimen>
+    <dimen name="quoteAuthor">15dp</dimen>
+    <dimen name="quoteNote">30dp</dimen>
+    <dimen name="paddingAll">4dp</dimen>
+</resources>

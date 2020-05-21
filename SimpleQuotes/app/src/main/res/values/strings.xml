@@ -1,4 +1,3 @@
 <resources>
     <string name="app_name">SimpleQuotes</string>
-    <string name="database_name">dbquotes.db</string>
 </resources>
